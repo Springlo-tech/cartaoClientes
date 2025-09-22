@@ -2,16 +2,15 @@
 <html>
   <head>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-    <!-- Necessário para rodar animações -->
     <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.0/dist/mindar-image-aframe.prod.js"></script>
   </head>
   <body>
     <a-scene mindar-image="imageTargetSrc: markers/targets.mind;" 
-             color-space="sRGB" 
-             renderer="colorManagement: true, physicallyCorrectLights" 
-             vr-mode-ui="enabled: false" 
-             device-orientation-permission-ui="enabled: false">
+      color-space="sRGB" 
+      renderer="colorManagement: true, physicallyCorrectLights" 
+      vr-mode-ui="enabled: false" 
+      device-orientation-permission-ui="enabled: false">
 
       <a-assets>
         <a-asset-item id="cubeModel" src="models/PapaiNoel.glb"></a-asset-item>
@@ -20,32 +19,96 @@
 
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-      <a-entity mindar-image-target="targetIndex: 0">
+      <a-entity mindar-image-target="targetIndex: 0" id="target">
         <a-gltf-model 
           src="#cubeModel" 
           scale="0.2 0.2 0.2" 
-          position="-0.5 -0.23 0.1" 
+          position="-0.5 -0.22 0.1" 
           rotation="0 0 0"
           animation-mixer="clip: *; loop: repeat">
         </a-gltf-model>
+
         <a-plane 
-            src="#fundo"
-            position="0 0 -0.1" 
-            width="1.5" 
-            height="1.5"
-            rotation="0 0 0"
-            transparent="true"
-            material="alphaTest: 0.5">
+          id="arvore"
+          src="#fundo"
+          position="0 0 -0.1" 
+          width="1.5" 
+          height="1.5"
+          rotation="0 0 0"
+          transparent="true"
+          material="transparent: true; opacity: 1;"
+          scale="0 0 0">
         </a-plane>
 
+        <a-text 
+          id="animatedText"
+          value="" 
+          position="0 0.8 0.1"
+          width="4" 
+          align="center"
+          color="#FFD700"
+          font="mozillavr">
+        </a-text>
       </a-entity>
     </a-scene>
 
     <script>
-      // Debug: ver quais animações o modelo tem
-      document.querySelector('a-gltf-model').addEventListener('model-loaded', (e) => {
-        const model = e.detail.model;
-        console.log("Animações disponíveis:", model.animations.map(a => a.name));
+      const text = "Feliz Natal!";
+      const el = document.querySelector("#animatedText");
+      const tree = document.querySelector("#arvore");
+      const targetEntity = document.querySelector("#target");
+      let typeTimeout, blinkInterval;
+      
+      function startTextAnimation() {
+        el.setAttribute("value", "");
+        let i = 0;
+        let cursorOn = true;
+
+        function type() {
+          if (i <= text.length) {
+            el.setAttribute("value", text.substring(0, i) + (cursorOn ? "|" : ""));
+            i++;
+            typeTimeout = setTimeout(type, 200);
+          } else {
+            blinkCursor();
+          }
+        }
+        
+        function blinkCursor() {
+          blinkInterval = setInterval(() => {
+            cursorOn = !cursorOn;
+            el.setAttribute("value", text + (cursorOn ? "|" : ""));
+          }, 500);
+        }
+        
+        typeTimeout = setTimeout(type, 2000);
+      }
+      
+      function stopTextAnimation() {
+        clearTimeout(typeTimeout);
+        clearInterval(blinkInterval);
+        el.setAttribute("value", "");
+      }
+      
+      // Evento quando o alvo é encontrado
+      targetEntity.addEventListener("targetFound", () => {
+        console.log("Alvo encontrado. Reiniciando animações.");
+
+        // Reinicia a animação da árvore
+        tree.setAttribute("scale", "0 0 0");
+        tree.setAttribute("animation", "property: scale; to: 1 1 1; delay: 500; dur: 500");
+
+        startTextAnimation();
+      });
+
+      // Evento quando o alvo é perdido
+      targetEntity.addEventListener("targetLost", () => {
+        console.log("Alvo perdido. Parando animações.");
+        
+        // Remove a animação da árvore para que ela não termine após a perda do alvo
+        tree.removeAttribute("animation");
+        
+        stopTextAnimation();
       });
     </script>
   </body>
