@@ -15,6 +15,7 @@
 
       <a-assets>
         <a-asset-item id="cubeModel" src="models/PapaiNoel.glb"></a-asset-item>
+        <img id="fundo" src="models/Arvore.png" crossorigin="anonymous">
       </a-assets>
 
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
@@ -22,11 +23,21 @@
       <a-entity mindar-image-target="targetIndex: 0">
         <a-gltf-model 
           src="#cubeModel" 
-          scale="0.4 0.4 0.4" 
-          position="0 0 0.1" 
+          scale="0.2 0.2 0.2" 
+          position="-0.5 -0.23 0.1" 
           rotation="0 0 0"
           animation-mixer="clip: *; loop: repeat">
         </a-gltf-model>
+        <a-plane 
+            src="#fundo"
+            position="0 0 -0.1" 
+            width="1.5" 
+            height="1.5"
+            rotation="0 0 0"
+            transparent="true"
+            material="alphaTest: 0.5">
+        </a-plane>
+
       </a-entity>
     </a-scene>
 
