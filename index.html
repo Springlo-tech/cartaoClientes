@@ -98,7 +98,11 @@
         tree.setAttribute("scale", "0 0 0");
         tree.setAttribute("animation", "property: scale; to: 1 1 1; delay: 500; dur: 500");
 
-        startTextAnimation();
+        // Adiciona um pequeno atraso para a animação do texto
+        // Isso ajuda em dispositivos móveis que precisam de mais tempo para renderizar a cena.
+        setTimeout(() => {
+          startTextAnimation();
+        }, 100);
       });
 
       // Evento quando o alvo é perdido
