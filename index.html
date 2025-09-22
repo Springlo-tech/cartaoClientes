@@ -2,20 +2,40 @@
 <html>
   <head>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <!-- Necessário para rodar animações -->
+    <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.0/dist/mindar-image-aframe.prod.js"></script>
   </head>
   <body>
-    <a-scene mindar-image="imageTargetSrc: markers/targets.mind;" color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
+    <a-scene mindar-image="imageTargetSrc: markers/targets.mind;" 
+             color-space="sRGB" 
+             renderer="colorManagement: true, physicallyCorrectLights" 
+             vr-mode-ui="enabled: false" 
+             device-orientation-permission-ui="enabled: false">
+
       <a-assets>
-        <a-asset-item id="porquinhoModel" src="models/PapaiNoel.glb"></a-asset-item>
+        <a-asset-item id="cubeModel" src="models/PapaiNoel.glb"></a-asset-item>
       </a-assets>
 
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
       <a-entity mindar-image-target="targetIndex: 0">
-        <a-gltf-model rotation="90 0 0" position="0 0 0.1" scale="0.4 0.4 0.4" src="#porquinhoModel" animation-mixer></a-gltf-model>
+        <a-gltf-model 
+          src="#cubeModel" 
+          scale="0.4 0.4 0.4" 
+          position="0 0 0.1" 
+          rotation="0 0 0"
+          animation-mixer="clip: *; loop: repeat">
+        </a-gltf-model>
       </a-entity>
     </a-scene>
+
+    <script>
+      // Debug: ver quais animações o modelo tem
+      document.querySelector('a-gltf-model').addEventListener('model-loaded', (e) => {
+        const model = e.detail.model;
+        console.log("Animações disponíveis:", model.animations.map(a => a.name));
+      });
+    </script>
   </body>
 </html>
-
