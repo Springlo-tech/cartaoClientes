@@ -24,39 +24,19 @@
         <a-gltf-model 
           src="#cubeModel" 
           scale="0.5 0.5 0.5" 
-          position="-0.5 -0.22 0.1" 
+          position="0 -0.22 0.1" 
           rotation="90 0 0"
           animation-mixer="clip: *; loop: repeat">
         </a-gltf-model>
 
-        <a-plane 
-          id="arvore"
-          src="#fundo"
-          position="0 0 -0.1" 
-          width="2.5" 
-          height="2.5"
-          rotation="90 0 0"
-          transparent="true"
-          material="transparent: true; opacity: 1;"
-          scale="0.2 0.2 0.2">
-        </a-plane>
+       
 
-        <a-text 
-          id="animatedText"
-          value="" 
-          position="0 0.2 0.1"
-          width="2.5" 
-          align="center"
-          color="#FFD700"
-          font="mozillavr">
-        </a-text>
+       
       </a-entity>
     </a-scene>
 
     <script>
-      const text = "Feliz Natal!";
-      const el = document.querySelector("#animatedText");
-      const tree = document.querySelector("#arvore");
+      
       const targetEntity = document.querySelector("#target");
       let typeTimeout, blinkInterval;
       
