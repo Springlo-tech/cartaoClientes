@@ -7,25 +7,25 @@
   </head>
   <body>
     <a-scene mindar-image="imageTargetSrc: markers/targets.mind;" 
+      mindar-image="imageTargetSrc: targets.mind; maxTrack: 1"
       color-space="sRGB" 
       renderer="colorManagement: true, physicallyCorrectLights" 
       vr-mode-ui="enabled: false" 
       device-orientation-permission-ui="enabled: false">
 
       <a-assets>
-        <a-asset-item id="cubeModel" src="models/PapaiNoel.glb"></a-asset-item>
-      
+        <a-asset-item id="presente" src="models/Presente.glb"></a-asset-item>
+
       </a-assets>
-     
 
       <a-camera position="0 0 -5" look-controls="enabled: false"></a-camera>
 
       <a-entity mindar-image-target="targetIndex: 0" id="target">
         <a-gltf-model 
-          src="#cubeModel" 
+          src="#presente" 
           scale="0.3 0.3 0.3" 
           position="0 0 0.5" 
-          rotation="0 0 0"
+          rotation=" 0 0"
           animation-mixer="clip: *; loop: repeat">
         </a-gltf-model>
       </a-entity>
