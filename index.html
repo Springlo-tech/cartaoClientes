@@ -7,7 +7,7 @@
   </head>
   <body>
     <a-scene
-      mindar-image="imageTargetSrc: markers/targets.mind; maxTrack: 1;maxTrack: 1; size: 0.115 0.066"
+      mindar-image="imageTargetSrc: markers/targets.mind; maxTrack: 1;maxTrack: 1; "
       color-space="sRGB"
       renderer="colorManagement: true, physicallyCorrectLights"
       vr-mode-ui="enabled: false"
@@ -21,17 +21,17 @@
       <a-camera position="0 0 -5" look-controls="enabled: false"></a-camera>
 
       <a-entity mindar-image-target="targetIndex: 0" id="target">
-        <!--<a-plane 
+        <a-plane 
           width="1" 
           height="0.6" 
           color="#FFFFFF" 
           position="0 0 0.001" 
-          rotation="0 0 0" ></a-plane>-->
+          rotation="0 0 0" ></a-plane>
 
         <a-gltf-model 
           src="#presente" 
          
-          scale = "0.115 0.066 0.1"
+          scale = "0.07 0.07 0.1"
           position="0 -0.05 0.5" 
           rotation="0 0 0"
           animation-mixer="clip: *; loop: repeat">
