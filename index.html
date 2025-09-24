@@ -6,87 +6,37 @@
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.0/dist/mindar-image-aframe.prod.js"></script>
   </head>
   <body>
-    <a-scene mindar-image="imageTargetSrc: markers/targets.mind;" 
-      mindar-image="imageTargetSrc: targets.mind; maxTrack: 1"
-      color-space="sRGB" 
-      renderer="colorManagement: true, physicallyCorrectLights" 
-      vr-mode-ui="enabled: false" 
-      device-orientation-permission-ui="enabled: false">
+    <a-scene
+      mindar-image="imageTargetSrc: markers/targets.mind; maxTrack: 1;maxTrack: 1; size: 0.115 0.066"
+      color-space="sRGB"
+      renderer="colorManagement: true, physicallyCorrectLights"
+      vr-mode-ui="enabled: false"
+      device-orientation-permission-ui="enabled: false"
+    >
 
       <a-assets>
         <a-asset-item id="presente" src="models/Presente.glb"></a-asset-item>
-
       </a-assets>
 
       <a-camera position="0 0 -5" look-controls="enabled: false"></a-camera>
 
       <a-entity mindar-image-target="targetIndex: 0" id="target">
+        <!--<a-plane 
+          width="1" 
+          height="0.6" 
+          color="#FFFFFF" 
+          position="0 0 0.001" 
+          rotation="0 0 0" ></a-plane>-->
+
         <a-gltf-model 
           src="#presente" 
-          scale="0.3 0.3 0.3" 
-          position="0 0 0.5" 
-          rotation=" 0 0"
+         
+          scale = "0.115 0.066 0.1"
+          position="0 -0.05 0.5" 
+          rotation="0 0 0"
           animation-mixer="clip: *; loop: repeat">
         </a-gltf-model>
       </a-entity>
     </a-scene>
-
-    <script>
-      
-      const targetEntity = document.querySelector("#target");
-      let typeTimeout, blinkInterval;
-      
-      function startTextAnimation() {
-        el.setAttribute("value", "");
-        let i = 0;
-        let cursorOn = true;
-
-        function type() {
-          if (i <= text.length) {
-            el.setAttribute("value", text.substring(0, i) + (cursorOn ? "|" : ""));
-            i++;
-            typeTimeout = setTimeout(type, 200);
-          } else {
-            blinkCursor();
-          }
-        }
-        
-        function blinkCursor() {
-          blinkInterval = setInterval(() => {
-            cursorOn = !cursorOn;
-            el.setAttribute("value", text + (cursorOn ? "|" : ""));
-          }, 500);
-        }
-        
-        typeTimeout = setTimeout(type, 2000);
-      }
-      
-      function stopTextAnimation() {
-        clearTimeout(typeTimeout);
-        clearInterval(blinkInterval);
-        el.setAttribute("value", "");
-      }
-      
-      // Evento quando o alvo é encontrado
-      targetEntity.addEventListener("targetFound", () => {
-        console.log("Alvo encontrado. Reiniciando animações.");
-
-        // Reinicia a animação da árvore
-        tree.setAttribute("scale", "0 0 0");
-        tree.setAttribute("animation", "property: scale; to: 1 1 1; delay: 2000; dur: 1000");
-
-        startTextAnimation();
-      });
-
-      // Evento quando o alvo é perdido
-      targetEntity.addEventListener("targetLost", () => {
-        console.log("Alvo perdido. Parando animações.");
-        
-        // Remove a animação da árvore para que ela não termine após a perda do alvo
-        tree.removeAttribute("animation");
-        
-        stopTextAnimation();
-      });
-    </script>
   </body>
 </html>
