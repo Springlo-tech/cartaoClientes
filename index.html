@@ -1,43 +1,102 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.0/dist/mindar-image-aframe.prod.js"></script>
-  </head>
+ <head>
+   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+   <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
+   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.0/dist/mindar-image-aframe.prod.js"></script>
+   <script src="https://unpkg.com/aframe-particle-system-component@1.1.0/dist/aframe-particle-system-component.min.js"></script>
+</head>
   <body>
-    <a-scene
-      mindar-image="imageTargetSrc: markers/targets.mind; maxTrack: 1;maxTrack: 1; "
+  <a-scene
+      mindar-image="imageTargetSrc: markers/targets.mind; maxTrack: 1;"
       color-space="sRGB"
       renderer="colorManagement: true, physicallyCorrectLights"
       vr-mode-ui="enabled: false"
       device-orientation-permission-ui="enabled: false"
-    >
+     >
+     <a-camera position="0 0 -5" look-controls="enabled: false"></a-camera>
 
-      <a-assets>
-         <img id="minhaTextura" src="images/cartao.png" /> 
-        <a-asset-item id="presente" src="models/Presente.glb"></a-asset-item>
-      </a-assets>
+     <a-entity mindar-image-target="targetIndex: 0" id="target-0">
+     <a-entity id="wrap-0"></a-entity>
+     </a-entity>
 
-      <a-camera position="0 0 -5" look-controls="enabled: false"></a-camera>
+     <a-entity mindar-image-target="targetIndex: 1" id="target-1">
+     <a-entity id="wrap-1"></a-entity>
+     </a-entity>
 
-      <a-entity mindar-image-target="targetIndex: 0" id="target">
-        <a-plane 
-          width="1" 
-          height="0.6" 
-          src="#minhaTextura" 
-          position="0 0 0.001" 
-          rotation="0 0 0" ></a-plane>
+     <a-entity mindar-image-target="targetIndex: 2" id="target-2">
+     <a-entity id="wrap-2"></a-entity>
+     </a-entity>
 
-        <a-gltf-model 
-          src="#presente" 
-         
-          scale = "0.09 0.09 0.1"
-          position="0 -0.04 0.2" 
-          rotation="0 0 0"
-          animation-mixer="clip: *; loop: repeat">
-        </a-gltf-model>
-      </a-entity>
-    </a-scene>
+   </a-scene>
+
+   <script>
+   // Dicionário: qual modelo pertence a cada imagem (targetIndex)
+   // ATENÇÃO: Adicionei o caminho para a imagem 2D (`img`) aqui.
+   const modelos = {
+   // Crie um arquivo 'bonecoNeve_card.jpg' na pasta 'images/'
+   0: { src: "models/bonecoNeve.glb", img: "images/cartao.png" }, 
+   // Crie um arquivo 'presente_card.jpg' na pasta 'images/'
+   1: { src: "models/presente.glb", img: "images/cartao.png" }, 
+   // Crie um arquivo 'arvore_card.jpg' na pasta 'images/'
+   2: { src: "models/arvore.glb", img: "images/arvore_card.jpg" }, 
+   // continue até o 9...
+   };
+
+   // Configurações base para o plano (2D):
+   const planeSettings = {
+   width: 1.1, // Largura do plano
+   height: 1.5, // Altura do plano (ajuste conforme a proporção da sua imagem)
+   position: "0 0 0", // Posicionado no centro do target
+   rotation: "0 0 0", // Vira o plano para ficar na horizontal (paralelo ao target)
+   // shader: flat melhora o desempenho e é bom para imagens 2D
+   material: "shader: flat; transparent: true; opacity: 1", 
+   };
+
+   // Para cada target configuramos lazy loading
+   Object.keys(modelos).forEach((index) => {
+   const target = document.querySelector(`#target-${index}`);
+   const wrap = document.querySelector(`#wrap-${index}`);
+
+   target.addEventListener("targetFound", () => {
+   // Só carrega se ainda não foi carregado
+   if (!wrap.hasChildNodes()) {
+ 
+   // 1. CRIA O PLANO DE IMAGEM (2D)
+   const plane = document.createElement("a-plane");
+   plane.setAttribute("src", `url(${modelos[index].img})`);
+   plane.setAttribute("width", planeSettings.width);
+   plane.setAttribute("height", planeSettings.height);
+   plane.setAttribute("position", planeSettings.position);
+   plane.setAttribute("rotation", planeSettings.rotation);
+   plane.setAttribute("material", planeSettings.material);
+   plane.setAttribute("id", `plane-${index}`);
+
+   // 2. CRIA O MODELO 3D
+   const model = document.createElement("a-gltf-model");
+   model.setAttribute("src", `url(${modelos[index].src})`);
+   model.setAttribute("scale", "0.6 0.6 0.2");
+   // Ajustei a posição Y para elevar o modelo 3D acima do plano 2D
+   model.setAttribute("position", "0 0.1 0.1"); 
+   model.setAttribute("rotation", "0 0 0");
+   model.setAttribute("animation-mixer", "clip: *; loop: repeat");
+   model.setAttribute("id", `model-${index}`);
+
+   // 3. ANEXA AMBOS ao container
+   wrap.appendChild(plane);
+   wrap.appendChild(model);
+   console.log(`Plano e Modelo do target ${index} carregados.`);
+   } else {
+   // Se já carregado, apenas torna visível
+   wrap.setAttribute("visible", "true");
+   }
+ });
+
+   target.addEventListener("targetLost", () => {
+   // Esconde o container inteiro
+   wrap.setAttribute("visible", "false");
+    });
+   });
+  </script>
   </body>
 </html>
