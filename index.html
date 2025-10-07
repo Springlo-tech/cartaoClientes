@@ -24,71 +24,91 @@
      <a-entity id="wrap-1"></a-entity>
      </a-entity>
 
-     
-
    </a-scene>
 
    <script>
    // Dicionário: qual modelo pertence a cada imagem (targetIndex)
-   // ATENÇÃO: Adicionei o caminho para a imagem 2D (`img`) aqui.
    const modelos = {
-   // Crie um arquivo 'bonecoNeve_card.jpg' na pasta 'images/'
-   0: { src: "models/bonecoNeve.glb", img: "images/cartao.jpeg" }, 
-   // Crie um arquivo 'presente_card.jpg' na pasta 'images/'
-   1: { src: "models/Presente.glb", img: "images/cartao.jpeg" }, 
+   // Inclua o caminho para o arquivo de áudio (Ex: assets/musica_0.mp3)
+   0: { src: "models/arvoreNatal.glb", img: "images/fundoVerde.jpg", audio: "musicas/natal.mp3" }, 
+   // Inclua o caminho para o arquivo de áudio (Ex: assets/musica_1.mp3)
+   1: { src: "models/Presente.glb", img: "images/cartao.jpeg", audio: "musicas/natal.mp3" }, 
    };
 
    // Configurações base para o plano (2D):
    const planeSettings = {
-   width: 1.1, // Largura do plano
-   height: 1.5, // Altura do plano (ajuste conforme a proporção da sua imagem)
-   position: "0 0 0", // Posicionado no centro do target
-   rotation: "0 0 0", // Vira o plano para ficar na horizontal (paralelo ao target)
-   // shader: flat melhora o desempenho e é bom para imagens 2D
+   width: 1.1, 
+   height: 1.5, 
+   position: "0 0 0", 
+   rotation: "0 0 0", 
    material: "shader: flat; transparent: true; opacity: 1", 
    };
 
-   // Para cada target configuramos lazy loading
+   // Para cada target configuramos lazy loading e o áudio
    Object.keys(modelos).forEach((index) => {
    const target = document.querySelector(`#target-${index}`);
    const wrap = document.querySelector(`#wrap-${index}`);
+   // Desestruturação para facilitar o uso das propriedades
+   const { src: modelSrc, img: imgSrc, audio: audioSrc } = modelos[index]; 
 
    target.addEventListener("targetFound", () => {
-   // Só carrega se ainda não foi carregado
+   // 1. CRIA OS ELEMENTOS SE AINDA NÃO FORAM CARREGADOS
    if (!wrap.hasChildNodes()) {
  
-   // 1. CRIA O PLANO DE IMAGEM (2D)
-   const plane = document.createElement("a-plane");
-   plane.setAttribute("src", `url(${modelos[index].img})`);
-   plane.setAttribute("width", planeSettings.width);
-   plane.setAttribute("height", planeSettings.height);
-   plane.setAttribute("position", planeSettings.position);
-   plane.setAttribute("rotation", planeSettings.rotation);
-   plane.setAttribute("material", planeSettings.material);
-   plane.setAttribute("id", `plane-${index}`);
+     // CRIA O PLANO DE IMAGEM (2D)
+     const plane = document.createElement("a-plane");
+     plane.setAttribute("src", `url(${imgSrc})`);
+     plane.setAttribute("width", planeSettings.width);
+     plane.setAttribute("height", planeSettings.height);
+     plane.setAttribute("position", planeSettings.position);
+     plane.setAttribute("rotation", planeSettings.rotation);
+     plane.setAttribute("material", planeSettings.material);
+     plane.setAttribute("id", `plane-${index}`);
 
-   // 2. CRIA O MODELO 3D
-   const model = document.createElement("a-gltf-model");
-   model.setAttribute("src", `url(${modelos[index].src})`);
-   model.setAttribute("scale", "0.6 0.6 0.2");
-   // Ajustei a posição Y para elevar o modelo 3D acima do plano 2D
-   model.setAttribute("position", "0 0.1 0.1"); 
-   model.setAttribute("rotation", "0 0 0");
-   model.setAttribute("animation-mixer", "clip: *; loop: repeat");
-   model.setAttribute("id", `model-${index}`);
+     // CRIA O MODELO 3D
+     const model = document.createElement("a-gltf-model");
+     model.setAttribute("src", `url(${modelSrc})`);
+     model.setAttribute("scale", "0.6 0.6 0.2");
+     model.setAttribute("position", "0 0.1 0.1"); 
+     model.setAttribute("rotation", "0 0 0");
+     model.setAttribute("animation-mixer", "clip: *; loop: repeat");
+     model.setAttribute("id", `model-${index}`);
 
-   // 3. ANEXA AMBOS ao container
-   wrap.appendChild(plane);
-   wrap.appendChild(model);
-   console.log(`Plano e Modelo do target ${index} carregados.`);
-   } else {
-   // Se já carregado, apenas torna visível
+     // NOVO: CRIA A ENTIDADE DE SOM
+     const soundEntity = document.createElement("a-entity");
+     soundEntity.setAttribute("sound", {
+       src: `url(${audioSrc})`, // Caminho do áudio
+       loop: true,               // Repete o áudio
+       autoplay: false,          // Inicia manualmente
+       positional: false         // Otimização: som não-espacial
+     });
+     soundEntity.setAttribute("id", `sound-${index}`);
+
+     // 3. ANEXA TODOS ao container
+     wrap.appendChild(plane);
+     wrap.appendChild(model);
+     wrap.appendChild(soundEntity); // ANEXANDO O SOM
+     console.log(`Plano, Modelo e Som do target ${index} carregados.`);
+   } 
+
+   // 4. REPRODUZ O SOM E TORNA O WRAP VISÍVEL
    wrap.setAttribute("visible", "true");
+   
+   // Obtém a referência à entidade de som e inicia a reprodução
+   const soundEntity = document.querySelector(`#sound-${index}`);
+   if (soundEntity && soundEntity.components.sound) {
+     soundEntity.components.sound.playSound(); // Inicia o áudio
    }
  });
 
    target.addEventListener("targetLost", () => {
-   // Esconde o container inteiro
+   // 5. PAUSA O SOM
+   const soundEntity = document.querySelector(`#sound-${index}`);
+   if (soundEntity && soundEntity.components.sound) {
+     soundEntity.components.sound.pauseSound(); // Pausa o áudio
+   }
+   
+   // 6. ESCONDE O CONTAINER INTEIRO
    wrap.setAttribute("visible", "false");
     });
    });
