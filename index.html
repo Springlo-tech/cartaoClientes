@@ -5,111 +5,193 @@
    <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.0/dist/mindar-image-aframe.prod.js"></script>
    <script src="https://unpkg.com/aframe-particle-system-component@1.1.0/dist/aframe-particle-system-component.min.js"></script>
+   
+   <style>
+      /* Estilos mantidos para a tela de introdução e o botão de início */
+      #splash-screen {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: #333;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          z-index: 9999;
+          color: white;
+          text-align: center;
+      }
+      #start-button {
+          padding: 15px 30px;
+          font-size: 1.2em;
+          cursor: pointer;
+          background-color: #007bff;
+          border: none;
+          border-radius: 5px;
+          color: white;
+          margin-top: 20px;
+      }
+      #minha-cena {
+          display: none; 
+      }
+   </style>
 </head>
   <body>
+  
+  <div id="splash-screen">
+      <h1>Realidade Aumentada Pronta</h1>
+      <p>É necessário um toque para iniciar a câmera e o áudio.</p>
+      <button id="start-button">Tocar para Iniciar RA</button>
+  </div>
+
   <a-scene
+      id="minha-cena" 
       mindar-image="imageTargetSrc: markers/targets.mind; maxTrack: 1;"
       color-space="sRGB"
       renderer="colorManagement: true, physicallyCorrectLights"
       vr-mode-ui="enabled: false"
       device-orientation-permission-ui="enabled: false"
      >
+
+     <a-assets>
+         <audio id="som-arvore" src="musicas/natal.mp3" preload="auto"></audio>
+         <audio id="som-presente" src="musicas/natal.mp3" preload="auto"></audio>
+     </a-assets>
+
      <a-camera position="0 0 -5" look-controls="enabled: false"></a-camera>
 
      <a-entity mindar-image-target="targetIndex: 0" id="target-0">
      <a-entity id="wrap-0"></a-entity>
+     <a-entity id="sound-0"></a-entity> 
      </a-entity>
 
      <a-entity mindar-image-target="targetIndex: 1" id="target-1">
      <a-entity id="wrap-1"></a-entity>
+     <a-entity id="sound-1"></a-entity> 
      </a-entity>
 
    </a-scene>
 
    <script>
-   // Dicionário: qual modelo pertence a cada imagem (targetIndex)
    const modelos = {
-   // Inclua o caminho para o arquivo de áudio (Ex: assets/musica_0.mp3)
-   0: { src: "models/arvoreNatal.glb", img: "images/fundoVerde.jpg", audio: "musicas/natal.mp3" }, 
-   // Inclua o caminho para o arquivo de áudio (Ex: assets/musica_1.mp3)
-   1: { src: "models/Presente.glb", img: "images/cartao.jpeg", audio: "musicas/natal.mp3" }, 
+   0: { 
+       src: "models/arvoreNatal.glb", 
+       img: "images/arvore_card.jpeg", 
+       audio: "#som-arvore" // ID do asset
+   }, 
+   1: { 
+       src: "models/Presente.glb", 
+       img: "images/cartao.jpeg", 
+       audio: "#som-presente" // ID do asset
+   }, 
    };
 
-   // Configurações base para o plano (2D):
    const planeSettings = {
-   width: 1.1, 
-   height: 1.5, 
-   position: "0 0 0", 
-   rotation: "0 0 0", 
-   material: "shader: flat; transparent: true; opacity: 1", 
+   width: 1.1, height: 1.5, position: "0 0 0", rotation: "0 0 0", material: "shader: flat; transparent: true; opacity: 1", 
    };
 
-   // Para cada target configuramos lazy loading e o áudio
+   // --- INICIALIZAÇÃO DE ÁUDIO NO INÍCIO DO SCRIPT ---
+   const scene = document.querySelector("#minha-cena");
+
+   // Aplica o componente 'sound' às entidades de som que foram criadas no HTML
+   Object.keys(modelos).forEach((index) => {
+       const soundEntity = document.querySelector(`#sound-${index}`);
+       const audioSrc = modelos[index].audio;
+       
+       // Configura o componente SOUND imediatamente
+       soundEntity.setAttribute("sound", {
+           src: audioSrc,            
+           loop: true,               
+           autoplay: false,          
+           positional: false,
+           volume: 1 // Volume normal
+       });
+   });
+   // -----------------------------------------------------
+
+   // --- LÓGICA DE SPLASH SCREEN E LIBERAÇÃO DO ÁUDIO ---
+   const startButton = document.querySelector('#start-button');
+   const splashScreen = document.querySelector('#splash-screen');
+
+   startButton.addEventListener('click', () => {
+       // 1. Libera o Áudio (interação do usuário)
+       // Tocamos e pausamos todos os sons pré-configurados para "acordar" o Web Audio API
+       Object.keys(modelos).forEach((index) => {
+            const soundEntity = document.querySelector(`#sound-${index}`);
+            if (soundEntity.components.sound) {
+               // Temporariamente definimos volume 0 para tocar e pausar sem som
+               soundEntity.setAttribute('sound', 'volume', 0);
+               soundEntity.components.sound.playSound();
+               soundEntity.components.sound.pauseSound();
+               
+               // Restaura o volume original (1)
+               soundEntity.setAttribute('sound', 'volume', 1);
+            }
+       });
+
+       // 2. Inicia a RA
+       splashScreen.style.display = 'none';
+       scene.style.display = 'block';
+       scene.emit('startAR'); 
+       
+       console.log("Áudio liberado e cena iniciada.");
+   });
+   // -----------------------------------------------------
+
+
+   // --- LÓGICA DE RASTREAMENTO (targetFound/targetLost) ---
    Object.keys(modelos).forEach((index) => {
    const target = document.querySelector(`#target-${index}`);
    const wrap = document.querySelector(`#wrap-${index}`);
-   // Desestruturação para facilitar o uso das propriedades
-   const { src: modelSrc, img: imgSrc, audio: audioSrc } = modelos[index]; 
 
    target.addEventListener("targetFound", () => {
-   // 1. CRIA OS ELEMENTOS SE AINDA NÃO FORAM CARREGADOS
-   if (!wrap.hasChildNodes()) {
- 
-     // CRIA O PLANO DE IMAGEM (2D)
-     const plane = document.createElement("a-plane");
-     plane.setAttribute("src", `url(${imgSrc})`);
-     plane.setAttribute("width", planeSettings.width);
-     plane.setAttribute("height", planeSettings.height);
-     plane.setAttribute("position", planeSettings.position);
-     plane.setAttribute("rotation", planeSettings.rotation);
-     plane.setAttribute("material", planeSettings.material);
-     plane.setAttribute("id", `plane-${index}`);
-
-     // CRIA O MODELO 3D
-     const model = document.createElement("a-gltf-model");
-     model.setAttribute("src", `url(${modelSrc})`);
-     model.setAttribute("scale", "0.6 0.6 0.2");
-     model.setAttribute("position", "0 0.1 0.1"); 
-     model.setAttribute("rotation", "0 0 0");
-     model.setAttribute("animation-mixer", "clip: *; loop: repeat");
-     model.setAttribute("id", `model-${index}`);
-
-     // NOVO: CRIA A ENTIDADE DE SOM
-     const soundEntity = document.createElement("a-entity");
-     soundEntity.setAttribute("sound", {
-       src: `url(${audioSrc})`, // Caminho do áudio
-       loop: true,               // Repete o áudio
-       autoplay: false,          // Inicia manualmente
-       positional: false         // Otimização: som não-espacial
-     });
-     soundEntity.setAttribute("id", `sound-${index}`);
-
-     // 3. ANEXA TODOS ao container
-     wrap.appendChild(plane);
-     wrap.appendChild(model);
-     wrap.appendChild(soundEntity); // ANEXANDO O SOM
-     console.log(`Plano, Modelo e Som do target ${index} carregados.`);
-   } 
-
-   // 4. REPRODUZ O SOM E TORNA O WRAP VISÍVEL
-   wrap.setAttribute("visible", "true");
    
-   // Obtém a referência à entidade de som e inicia a reprodução
-   const soundEntity = document.querySelector(`#sound-${index}`);
-   if (soundEntity && soundEntity.components.sound) {
-     soundEntity.components.sound.playSound(); // Inicia o áudio
-   }
- });
+     // CRIA SÓ AS ENTIDADES VISUAIS (3D e 2D) se ainda não existirem
+     if (!wrap.hasChildNodes()) {
+       const { src: modelSrc, img: imgSrc } = modelos[index];
+
+       const plane = document.createElement("a-plane");
+       plane.setAttribute("src", `url(${imgSrc})`);
+       plane.setAttribute("width", planeSettings.width);
+       plane.setAttribute("height", planeSettings.height);
+       plane.setAttribute("position", planeSettings.position);
+       plane.setAttribute("rotation", planeSettings.rotation);
+       plane.setAttribute("material", planeSettings.material);
+
+       const model = document.createElement("a-gltf-model");
+       model.setAttribute("src", `url(${modelSrc})`);
+       model.setAttribute("scale", "0.6 0.6 0.2");
+       model.setAttribute("position", "0 0.1 0.1"); 
+       model.setAttribute("rotation", "0 0 0");
+       model.setAttribute("animation-mixer", "clip: *; loop: repeat");
+
+       wrap.appendChild(plane);
+       wrap.appendChild(model);
+       console.log(`Plano e Modelo do target ${index} criados.`);
+     } 
+
+     // 4. REPRODUZ O SOM
+     wrap.setAttribute("visible", "true");
+     
+     // O som JÁ EXISTE e JÁ FOI INICIALIZADO pelo clique do usuário.
+     const soundEntity = document.querySelector(`#sound-${index}`);
+     if (soundEntity && soundEntity.components.sound) {
+       soundEntity.components.sound.playSound(); 
+       console.log(`Som ${index} tocando.`);
+     }
+   });
 
    target.addEventListener("targetLost", () => {
-   // 5. PAUSA O SOM
-   const soundEntity = document.querySelector(`#sound-${index}`);
-   if (soundEntity && soundEntity.components.sound) {
-     soundEntity.components.sound.pauseSound(); // Pausa o áudio
-   }
-   
-   // 6. ESCONDE O CONTAINER INTEIRO
-   wrap.setAttribute("visible", "false");
+     // 5. PAUSA O SOM
+     const soundEntity = document.querySelector(`#sound-${index}`);
+     if (soundEntity && soundEntity.components.sound) {
+       soundEntity.components.sound.pauseSound(); 
+     }
+     
+     // 6. ESCONDE O CONTAINER
+     wrap.setAttribute("visible", "false");
     });
    });
   </script>
