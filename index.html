@@ -7,7 +7,7 @@
    <script src="https://unpkg.com/aframe-particle-system-component@1.1.0/dist/aframe-particle-system-component.min.js"></script>
    
    <style>
-      /* Estilos mantidos para a tela de introdução e o botão de início */
+      /* ESTILOS DA TELA DE INTRODUÇÃO */
       #splash-screen {
           position: fixed;
           top: 0;
@@ -58,33 +58,92 @@
      <a-assets>
          <audio id="som-arvore" src="musicas/natal.mp3" preload="auto"></audio>
          <audio id="som-presente" src="musicas/natal.mp3" preload="auto"></audio>
+          <audio id="som-presente" src="musicas/natal.mp3" preload="auto"></audio>
      </a-assets>
 
      <a-camera position="0 0 -5" look-controls="enabled: false"></a-camera>
 
      <a-entity mindar-image-target="targetIndex: 0" id="target-0">
      <a-entity id="wrap-0"></a-entity>
-     <a-entity id="sound-0"></a-entity> 
+     <a-entity id="sound-0"></a-entity>
      </a-entity>
 
      <a-entity mindar-image-target="targetIndex: 1" id="target-1">
      <a-entity id="wrap-1"></a-entity>
-     <a-entity id="sound-1"></a-entity> 
+     <a-entity id="sound-1"></a-entity>
+     </a-entity>
+
+     <a-entity mindar-image-target="targetIndex: 2" id="target-2">
+     <a-entity id="wrap-2"></a-entity>
+     <a-entity id="sound-2"></a-entity>
      </a-entity>
 
    </a-scene>
 
    <script>
+   
+   // --- PASSO 1: DEFINIÇÃO DO COMPONENTE OTIMIZADO (color-cycle-opt) ---
+   AFRAME.registerComponent('color-cycle-opt', {
+     schema: {
+       colors: {type: 'array', default: ['#ff0000', '#00ff00', '#0000ff'], parse: AFRAME.utils.styleParser.toArray},
+       interval: {type: 'number', default: 5000} 
+     },
+     init: function () {
+       this.colorIndex = 0;
+       this.materials = []; 
+       this.intervalId = null;
+       this.el.addEventListener('model-loaded', this.setupMaterials.bind(this));
+     },
+     setupMaterials: function () {
+       const model = this.el.getObject3D('mesh'); 
+       if (!model) return;
+       this.materials = []; 
+       model.traverse((node) => {
+         if (node.isMesh && node.material) {
+           const nodeMaterials = Array.isArray(node.material) ? node.material : [node.material];
+           this.materials.push(...nodeMaterials);
+         }
+       });
+       if (this.intervalId) {
+           clearInterval(this.intervalId);
+       }
+       this.intervalId = setInterval(this.cycleColor.bind(this), this.data.interval);
+       this.cycleColor();
+       console.log(`Ciclo de cor iniciado com ${this.materials.length} materiais.`);
+     },
+     cycleColor: function () {
+       if (this.materials.length === 0) return;
+       const newColor = this.data.colors[this.colorIndex];
+       this.materials.forEach(material => {
+           material.emissive.set(newColor);
+           material.emissiveIntensity = 1; 
+       });
+       this.colorIndex = (this.colorIndex + 1) % this.data.colors.length;
+     },
+     remove: function () {
+       if (this.intervalId) {
+           clearInterval(this.intervalId);
+       }
+     }
+   });
+   
+   // --- PASSO 2: DADOS E VARIÁVEIS DA CENA ---
    const modelos = {
    0: { 
-       src: "models/arvoreNatal.glb", 
-       img: "images/fundoVerde.jpeg", 
-       audio: "#som-arvore" // ID do asset
+       src: "models/bonecoNeve.glb", 
+       img: "images/cartao.jpeg", 
+       audio: "#som-presente" 
+      
    }, 
    1: { 
-       src: "models/Presente.glb", 
-       img: "images/cartao.jpeg", 
-       audio: "#som-presente" // ID do asset
+        src: "models/arvoreNatal.glb", 
+        img: "images/cartao.jpeg", 
+        audio: "#som-arvore" 
+   }, 
+   2: { 
+        src: "models/presente.glb", 
+        img: "images/cartao.jpeg", 
+        audio: "#som-arvore" 
    }, 
    };
 
@@ -92,66 +151,56 @@
    width: 1.1, height: 1.5, position: "0 0 0", rotation: "0 0 0", material: "shader: flat; transparent: true; opacity: 1", 
    };
 
-   // --- INICIALIZAÇÃO DE ÁUDIO NO INÍCIO DO SCRIPT ---
    const scene = document.querySelector("#minha-cena");
-
-   // Aplica o componente 'sound' às entidades de som que foram criadas no HTML
+   
+   // --- PASSO 3: CONFIGURAÇÃO DE SOM INICIAL (PRÉ-CARREGAMENTO) ---
    Object.keys(modelos).forEach((index) => {
        const soundEntity = document.querySelector(`#sound-${index}`);
        const audioSrc = modelos[index].audio;
        
-       // Configura o componente SOUND imediatamente
        soundEntity.setAttribute("sound", {
            src: audioSrc,            
            loop: true,               
            autoplay: false,          
            positional: false,
-           volume: 1 // Volume normal
+           volume: 1 
        });
    });
-   // -----------------------------------------------------
 
-   // --- LÓGICA DE SPLASH SCREEN E LIBERAÇÃO DO ÁUDIO ---
+   // --- PASSO 4: LÓGICA DE SPLASH SCREEN E LIBERAÇÃO DO ÁUDIO ---
    const startButton = document.querySelector('#start-button');
    const splashScreen = document.querySelector('#splash-screen');
 
    startButton.addEventListener('click', () => {
-       // 1. Libera o Áudio (interação do usuário)
-       // Tocamos e pausamos todos os sons pré-configurados para "acordar" o Web Audio API
+       // Libera o Áudio (interação do clique)
        Object.keys(modelos).forEach((index) => {
             const soundEntity = document.querySelector(`#sound-${index}`);
             if (soundEntity.components.sound) {
-               // Temporariamente definimos volume 0 para tocar e pausar sem som
                soundEntity.setAttribute('sound', 'volume', 0);
                soundEntity.components.sound.playSound();
                soundEntity.components.sound.pauseSound();
-               
-               // Restaura o volume original (1)
-               soundEntity.setAttribute('sound', 'volume', 1);
+               soundEntity.setAttribute('sound', 'volume', 1); // Restaura o volume
             }
        });
 
-       // 2. Inicia a RA
+       // Inicia a RA
        splashScreen.style.display = 'none';
        scene.style.display = 'block';
        scene.emit('startAR'); 
-       
-       console.log("Áudio liberado e cena iniciada.");
    });
-   // -----------------------------------------------------
 
 
-   // --- LÓGICA DE RASTREAMENTO (targetFound/targetLost) ---
+   // --- PASSO 5: LÓGICA DE RASTREAMENTO (targetFound/targetLost) ---
    Object.keys(modelos).forEach((index) => {
    const target = document.querySelector(`#target-${index}`);
    const wrap = document.querySelector(`#wrap-${index}`);
 
    target.addEventListener("targetFound", () => {
    
-     // CRIA SÓ AS ENTIDADES VISUAIS (3D e 2D) se ainda não existirem
      if (!wrap.hasChildNodes()) {
        const { src: modelSrc, img: imgSrc } = modelos[index];
 
+       // Cria o plano
        const plane = document.createElement("a-plane");
        plane.setAttribute("src", `url(${imgSrc})`);
        plane.setAttribute("width", planeSettings.width);
@@ -160,37 +209,34 @@
        plane.setAttribute("rotation", planeSettings.rotation);
        plane.setAttribute("material", planeSettings.material);
 
+       // Cria o Modelo 3D
        const model = document.createElement("a-gltf-model");
        model.setAttribute("src", `url(${modelSrc})`);
        model.setAttribute("scale", "0.6 0.6 0.2");
        model.setAttribute("position", "0 0.1 0.1"); 
        model.setAttribute("rotation", "0 0 0");
        model.setAttribute("animation-mixer", "clip: *; loop: repeat");
-
+     
        wrap.appendChild(plane);
        wrap.appendChild(model);
-       console.log(`Plano e Modelo do target ${index} criados.`);
      } 
 
-     // 4. REPRODUZ O SOM
+     // Reproduz o Som
      wrap.setAttribute("visible", "true");
-     
-     // O som JÁ EXISTE e JÁ FOI INICIALIZADO pelo clique do usuário.
      const soundEntity = document.querySelector(`#sound-${index}`);
      if (soundEntity && soundEntity.components.sound) {
        soundEntity.components.sound.playSound(); 
-       console.log(`Som ${index} tocando.`);
      }
    });
 
    target.addEventListener("targetLost", () => {
-     // 5. PAUSA O SOM
+     // Pausa o Som
      const soundEntity = document.querySelector(`#sound-${index}`);
      if (soundEntity && soundEntity.components.sound) {
        soundEntity.components.sound.pauseSound(); 
      }
      
-     // 6. ESCONDE O CONTAINER
+     // Esconde o Container
      wrap.setAttribute("visible", "false");
     });
    });
