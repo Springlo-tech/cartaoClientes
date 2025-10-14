@@ -48,7 +48,7 @@
 
   <a-scene
       id="minha-cena" 
-      mindar-image="imageTargetSrc: markers/targets.mind; maxTrack: 1;"
+      mindar-image="imageTargetSrc: markers/targetsqr.mind; maxTrack: 1;"
       color-space="sRGB"
       renderer="colorManagement: true, physicallyCorrectLights"
       vr-mode-ui="enabled: false"
@@ -57,8 +57,7 @@
 
      <a-assets>
          <audio id="musica-target-0" src="musicas/natal.mp3" preload="auto"></audio>
-         <audio id="musica-target-1" src="musicas/natal.mp3" preload="auto"></audio>
-         <audio id="musica-target-2" src="musicas/natal.mp3" preload="auto"></audio>
+         
      </a-assets>
 
      <a-camera position="0 0 -5" look-controls="enabled: false"></a-camera>
@@ -68,15 +67,7 @@
      <a-entity id="sound-0"></a-entity>
      </a-entity>
 
-     <a-entity mindar-image-target="targetIndex: 1" id="target-1">
-     <a-entity id="wrap-1"></a-entity>
-     <a-entity id="sound-1"></a-entity>
-     </a-entity>
-
-     <a-entity mindar-image-target="targetIndex: 2" id="target-2">
-     <a-entity id="wrap-2"></a-entity>
-     <a-entity id="sound-2"></a-entity>
-     </a-entity>
+     
 
    </a-scene>
 
@@ -199,19 +190,12 @@
      if (!wrap.hasChildNodes()) {
        const { src: modelSrc, img: imgSrc } = modelos[index];
 
-       // Cria o plano
-       //const plane = document.createElement("a-plane");
-       //plane.setAttribute("src", `url(${imgSrc})`);
-       //plane.setAttribute("width", planeSettings.width);
-       //plane.setAttribute("height", planeSettings.height);
-       //plane.setAttribute("position", planeSettings.position);
-       //plane.setAttribute("rotation", planeSettings.rotation);
-       //plane.setAttribute("material", planeSettings.material);
+      
 
        // Cria o Modelo 3D
        const model = document.createElement("a-gltf-model");
        model.setAttribute("src", `url(${modelSrc})`);
-       model.setAttribute("scale", "0.6 0.6 0.2");
+       model.setAttribute("scale", "0.65 0.65 0.25");
        model.setAttribute("position", "0 0 0"); 
        model.setAttribute("rotation", "90 0 0");
        model.setAttribute("animation-mixer", "clip: *; loop: repeat");
