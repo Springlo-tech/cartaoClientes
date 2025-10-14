@@ -145,16 +145,7 @@
        img: "images/cartao.jpeg", 
        audio: "#musica-target-0" // ID de áudio atualizado
    }, 
-   1: { 
-        src: "models/arvoreNatal.glb", 
-        img: "images/cartao.jpeg", 
-        audio: "#musica-target-1" // ID de áudio atualizado
-   }, 
-   2: { 
-        src: "models/presente.glb", 
-        img: "images/cartao.jpeg", 
-        audio: "#musica-target-2" // ID de áudio atualizado
-   }, 
+   
    };
 
    const planeSettings = {
@@ -221,19 +212,10 @@
        const model = document.createElement("a-gltf-model");
        model.setAttribute("src", `url(${modelSrc})`);
        model.setAttribute("scale", "0.6 0.6 0.2");
-       model.setAttribute("position", "0 0.1 0.1"); 
+       model.setAttribute("position", "0 0 0"); 
        model.setAttribute("rotation", "90 0 0");
        model.setAttribute("animation-mixer", "clip: *; loop: repeat");
        
-       // Aplica a lógica do ciclo de cores apenas ao Target 1 (Árvore de Natal, conforme o seu último mapa de modelos)
-       if (index === '1') {
-           model.setAttribute("color-cycle-opt", {
-               // Cores: Vermelho, Azul, e Preto (estado Original)
-               colors: ['#FF0000', '#0000FF', '#000000'], 
-               interval: 5000 // 5 segundos
-           });
-           console.log("Ciclo de cores aplicado à Árvore de Natal (Target 1).");
-       }
 
        //wrap.appendChild(plane);
        wrap.appendChild(model);
