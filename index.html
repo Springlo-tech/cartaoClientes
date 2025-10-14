@@ -5,7 +5,7 @@
    <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.0/dist/mindar-image-aframe.prod.js"></script>
    <script src="https://unpkg.com/aframe-particle-system-component@1.1.0/dist/aframe-particle-system-component.min.js"></script>
-   
+ 
    <style>
       /* ESTILOS DA TELA DE INTRODUÇÃO */
       #splash-screen {
@@ -222,7 +222,7 @@
        model.setAttribute("src", `url(${modelSrc})`);
        model.setAttribute("scale", "0.6 0.6 0.2");
        model.setAttribute("position", "0 0.1 0.1"); 
-       model.setAttribute("rotation", "0 0 0");
+       model.setAttribute("rotation", "90 0 0");
        model.setAttribute("animation-mixer", "clip: *; loop: repeat");
        
        // Aplica a lógica do ciclo de cores apenas ao Target 1 (Árvore de Natal, conforme o seu último mapa de modelos)
