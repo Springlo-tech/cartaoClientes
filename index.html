@@ -139,9 +139,7 @@
    
    };
 
-   const planeSettings = {
-   width: 1.1, height: 1.5, position: "0 0 0", rotation: "0 0 0", material: "shader: flat; transparent: true; opacity: 1", 
-   };
+   
 
    const scene = document.querySelector("#minha-cena");
    
@@ -195,8 +193,8 @@
        // Cria o Modelo 3D
        const model = document.createElement("a-gltf-model");
        model.setAttribute("src", `url(${modelSrc})`);
-       model.setAttribute("scale", "0.65 0.65 0.25");
-       model.setAttribute("position", "0 0 0"); 
+       model.setAttribute("scale", "0.7 0.7 0.7");
+       model.setAttribute("position", "0 0.01 0.8"); 
        model.setAttribute("rotation", "90 0 0");
        model.setAttribute("animation-mixer", "clip: *; loop: repeat");
        
