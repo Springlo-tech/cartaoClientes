@@ -43,7 +43,7 @@
 
   <a-scene
     id="minha-cena"
-    mindar-image="imageTargetSrc: markers/targets.mind; maxTrack: 1;" 
+    mindar-image="imageTargetSrc: ../markers/targets.mind; maxTrack: 1;" 
     color-space="sRGB"
     renderer="colorManagement: true, physicallyCorrectLights"
     vr-mode-ui="enabled: false"
@@ -52,13 +52,13 @@
     <a-assets>
       <img id="logo-dinamico" src="" crossorigin="anonymous" /> 
 
-      <audio id="som1" src="assets/musicas/natal.mp3" preload="auto"></audio>
-      <audio id="som2" src="assets/musicas/natal.mp3" preload="auto"></audio>
-      <audio id="som3" src="assets/musicas/natal.mp3" preload="auto"></audio>
+      <audio id="som1" src="../assets/musicas/natal.mp3" preload="auto"></audio>
+      <audio id="som2" src="../assets/musicas/natal.mp3" preload="auto"></audio>
+      <audio id="som3" src="../assets/musicas/natal.mp3" preload="auto"></audio>
 
-      <a-asset-item id="modeloA" src="assets/modelos/bonecoNeve.glb"></a-asset-item>
-      <a-asset-item id="modeloB" src="assets/modelos/arvoreNatal.glb"></a-asset-item>
-      <a-asset-item id="modeloC" src="assets/modelos/presente.glb"></a-asset-item>
+      <a-asset-item id="modeloA" src="../assets/modelos/bonecoNeve.glb"></a-asset-item>
+      <a-asset-item id="modeloB" src="../assets/modelos/arvoreNatal.glb"></a-asset-item>
+      <a-asset-item id="modeloC" src="../assets/modelos/presente.glb"></a-asset-item>
     </a-assets>
 
     <a-camera position="0 0 -5" look-controls="enabled: false"></a-camera>
@@ -179,15 +179,15 @@
     // Mapeamento dos clientes para o caminho do logo e título
     switch (clienteParam ? clienteParam.toUpperCase() : '') {
       case 'A':
-        logoPath = 'assets/imagens/logo-A.png'; 
+        logoPath = '../assets/imagens/logo-A.png'; 
         titulo = 'Presente de Natal - Cliente A';
         break;
       case 'B':
-        logoPath = 'assets/imagens/logo-B.jpg'; 
+        logoPath = '../assets/imagens/logo-B.jpg'; 
         titulo = 'Boas Festas - Cliente B';
         break;
       case 'C':
-         logoPath = 'assets/imagens/logo-B.jpg'; 
+         logoPath = '../assets/imagens/logo-B.jpg'; 
         titulo = 'Feliz Natal - Cliente C';
         break;
       default:
@@ -209,9 +209,9 @@
 
     // Sons (Mantido)
     const audios = [
-      new Audio('assets/musicas/natal.mp3'), // Índice 0
-      new Audio('assets/musicas/natal.mp3'), // Índice 1
-      new Audio('assets/musicas/natal.mp3')  // Índice 2
+      new Audio('../assets/musicas/natal.mp3'), // Índice 0
+      new Audio('../assets/musicas/natal.mp3'), // Índice 1
+      new Audio('../assets/musicas/natal.mp3')  // Índice 2
     ];
     audios.forEach(a => a.loop = true);
 
