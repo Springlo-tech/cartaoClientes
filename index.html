@@ -43,7 +43,7 @@
 
   <a-scene
     id="minha-cena"
-    mindar-image="imageTargetSrc: markers/targets.mind; maxTrack: 1;" 
+    mindar-image="imageTargetSrc: ../markers/targets_BAPC.mind; maxTrack: 1;" 
     color-space="sRGB"
     renderer="colorManagement: true, physicallyCorrectLights"
     vr-mode-ui="enabled: false"
@@ -52,32 +52,52 @@
     <a-assets>
       <img id="logo-dinamico" src="" crossorigin="anonymous" /> 
 
-      <audio id="som1" src="assets/musicas/natal.mp3" preload="auto"></audio>
-      <audio id="som2" src="assets/musicas/natal.mp3" preload="auto"></audio>
-      <audio id="som3" src="assets/musicas/natal.mp3" preload="auto"></audio>
+      <img id="background-img" src="../assets/imagens/FundoCartao.jpeg" crossorigin="anonymous" />
+      <img id="background-img2" src="../assets/imagens/FundoConvite.jpg" crossorigin="anonymous" />
+      <audio id="som1" src="../assets/musicas/natal.mp3" preload="auto"></audio>
+      <audio id="som2" src="../assets/musicas/natal.mp3" preload="auto"></audio>
+      <audio id="som3" src="../assets/musicas/natal.mp3" preload="auto"></audio>
+      <audio id="som4" src="../assets/musicas/casamento.mp3" preload="auto"></audio>
 
-      <a-asset-item id="modeloA" src="assets/modelos/bonecoNeve.glb"></a-asset-item>
-      <a-asset-item id="modeloB" src="assets/modelos/arvoreNatal.glb"></a-asset-item>
-      <a-asset-item id="modeloC" src="assets/modelos/presente.glb"></a-asset-item>
+
+      <a-asset-item id="modeloA" src="../assets/modelos/bonecoNeve.glb"></a-asset-item>
+      <a-asset-item id="modeloB" src="../assets/modelos/arvoreNatal.glb"></a-asset-item>
+      <a-asset-item id="modeloC" src="../assets/modelos/presente.glb"></a-asset-item>
+      <a-asset-item id="modeloD" src="../assets/modelos/noivos.glb"></a-asset-item>
+
     </a-assets>
 
     <a-camera position="0 0 -5" look-controls="enabled: false"></a-camera>
-
+   
     <a-entity mindar-image-target="targetIndex: 0" id="targetA">
+      <a-plane src="#background-img"
+           width="1.11" height="1.52"
+           position="0 0 -0.2"
+           material="transparent: true; opacity: 1;">
+      </a-plane>
       <a-plane src="#logo-dinamico" 
-               width="0.3" height="0.3" 
-               position="0 0.8 0.1" 
-               rotation="0 0 0"></a-plane> <a-gltf-model 
+           width="0.3" height="0.3" 
+           osition="0 0.8 0.1" 
+           rotation="0 0 0">
+      </a-plane> 
+     
+      <a-gltf-model 
           id="modelo-0" 
           src="#modeloA" 
           scale="0.5 0.5 0.5" 
-          position="0 0 0.2" 
+          position="0.1 0 0.2" 
           visible="false"
           animation-mixer="clip: *; loop: repeat; timeScale: 0">
       </a-gltf-model>
+     
     </a-entity>
 
     <a-entity mindar-image-target="targetIndex: 1" id="targetB">
+      <a-plane src="#background-img"
+           width="1.11" height="1.52"
+           position="0 0 -0.2"
+           material="transparent: true; opacity: 1;">
+      </a-plane>
       <a-plane src="#logo-dinamico" 
                width="0.3" height="0.3" 
                position="0 0.8 0.1" 
@@ -95,6 +115,11 @@
     </a-entity>
 
     <a-entity mindar-image-target="targetIndex: 2" id="targetC">
+      <a-plane src="#background-img"
+           width="1.11" height="1.52"
+           position="0 0 -0.2"
+           material="transparent: true; opacity: 1;">
+      </a-plane>
       <a-plane src="#logo-dinamico" 
                width="0.3" height="0.3" 
                position="0 0.8 0.1" 
@@ -107,63 +132,80 @@
           animation-mixer="clip: *; loop: repeat; timeScale: 0">
       </a-gltf-model>
     </a-entity>
+
+    <a-entity mindar-image-target="targetIndex: 3" id="targetD">
+      <a-plane src="#background-img2"
+           width="1.11" height="1.52"
+           position="0 0 -0.2"
+           material="transparent: true; opacity: 1;">
+      </a-plane>
+
+      <a-gltf-model 
+          id="modelo-3" 
+          src="#modeloD" 
+          scale="0.5 0.5 0.5" 
+          position="0.1 0 0.2" 
+          visible="false"
+          animation-mixer="clip: *; loop: repeat; timeScale: 0">
+      </a-gltf-model>
+     
+    </a-entity>
   </a-scene>
 
   <script>
       // --- PASSO 1: DEFINIÇÃO DO COMPONENTE OTIMIZADO (color-cycle-opt) ---
-    AFRAME.registerComponent('color-cycle-opt', {
-     schema: {
-       colors: {type: 'array', default: ['#ff0000', '#00ff00', '#0000ff'], parse: AFRAME.utils.styleParser.toArray},
-       interval: {type: 'number', default: 5000} 
-     },
-     init: function () {
-       this.colorIndex = 0;
-       this.materials = []; 
-       this.intervalId = null;
-       this.el.addEventListener('model-loaded', this.setupMaterials.bind(this));
-     },
-     setupMaterials: function () {
-       const model = this.el.getObject3D('mesh'); 
-       if (!model) return;
-       this.materials = []; 
-       model.traverse((node) => {
-         if (node.isMesh && node.material) {
-           const nodeMaterials = Array.isArray(node.material) ? node.material : [node.material];
-           this.materials.push(...nodeMaterials);
-         }
-       });
-       if (this.intervalId) {
-           clearInterval(this.intervalId);
-       }
-       this.intervalId = setInterval(this.cycleColor.bind(this), this.data.interval);
-       this.cycleColor();
-       console.log(`Ciclo de cor iniciado com ${this.materials.length} materiais.`);
-     },
-     cycleColor: function () {
-       if (this.materials.length === 0) return;
-       
-       const newColor = this.data.colors[this.colorIndex];
+     AFRAME.registerComponent('color-cycle-opt', {
+     schema: {
+     colors: {type: 'array', default: ['#ff0000', '#00ff00', '#0000ff'], parse: AFRAME.utils.styleParser.toArray},
+     interval: {type: 'number', default: 5000}
+     },
+     init: function () {
+       this.colorIndex = 0;
+       this.materials = [];
+       this.intervalId = null;
+       this.el.addEventListener('model-loaded', this.setupMaterials.bind(this));
+     },
+     setupMaterials: function () {
+       const model = this.el.getObject3D('mesh');
+       if (!model) return;
+       this.materials = [];
+       model.traverse((node) => {
+         if (node.isMesh && node.material) {
+          const nodeMaterials = Array.isArray(node.material) ? node.material : [node.material];
+          this.materials.push(...nodeMaterials);
+          }
+       });
+       if (this.intervalId) {
+           clearInterval(this.intervalId);
+        }
+       this.intervalId = setInterval(this.cycleColor.bind(this), this.data.interval);
+       this.cycleColor();
+       console.log(`Ciclo de cor iniciado com ${this.materials.length} materiais.`);
+     },
+     cycleColor: function () {
+       if (this.materials.length === 0) return;
+       const newColor = this.data.colors[this.colorIndex];
 
-       this.materials.forEach(material => {
-           // Se for a cor preta, desligamos a emissão para mostrar a cor original
-           if (newColor === '#000000') {
-               material.emissive.set(0x000000); 
-               material.emissiveIntensity = 0; 
-           } else {
-               // Aplicamos a cor emissiva normalmente
-               material.emissive.set(newColor);
-               material.emissiveIntensity = 1; 
-           }
-       });
+       this.materials.forEach(material => {
+       // Se for a cor preta, desligamos a emissão para mostrar a cor original
+          if (newColor === '#000000') {
+               material.emissive.set(0x000000);
+               material.emissiveIntensity = 0;
+          } else {
+          // Aplicamos a cor emissiva normalmente
+               material.emissive.set(newColor);
+               material.emissiveIntensity = 1;
+          }
+      });
 
-       this.colorIndex = (this.colorIndex + 1) % this.data.colors.length;
-     },
-     remove: function () {
-       if (this.intervalId) {
-           clearInterval(this.intervalId);
-       }
-     }
-   });
+      this.colorIndex = (this.colorIndex + 1) % this.data.colors.length;
+     },
+     remove: function () {
+       if (this.intervalId) {
+          clearInterval(this.intervalId);
+     }
+}
+});
 
     // --- Lógica de Personalização ---
 
@@ -179,16 +221,20 @@
     // Mapeamento dos clientes para o caminho do logo e título
     switch (clienteParam ? clienteParam.toUpperCase() : '') {
       case 'A':
-        logoPath = 'assets/imagens/logo-A.png'; 
+        logoPath = '../assets/imagens/logo-A.png'; 
         titulo = 'Presente de Natal - Cliente A';
         break;
       case 'B':
-        logoPath = 'assets/imagens/logo-B.jpg'; 
+        logoPath = '../assets/imagens/logo-B.jpg'; 
         titulo = 'Boas Festas - Cliente B';
         break;
       case 'C':
-         logoPath = 'assets/imagens/logo-B.jpg'; 
+         logoPath = '../assets/imagens/logo-B.jpg'; 
         titulo = 'Feliz Natal - Cliente C';
+        break;
+      case 'D':
+         logoPath = '../assets/imagens/logo-B.jpg'; 
+        titulo = 'Feliz Natal - Cliente D';
         break;
       default:
         // Caso não tenha parâmetro
@@ -199,19 +245,16 @@
     document.getElementById('logo-cliente').src = logoPath;
     document.getElementById('titulo-cliente').textContent = titulo;
     document.getElementById('logo-dinamico').src = logoPath;
-
-
     // --- Lógica de Inicialização e AR (Original) ---
-
     const splash = document.getElementById('splash-screen');
     const startBtn = document.getElementById('start-button');
     const scene = document.getElementById('minha-cena');
-
     // Sons (Mantido)
     const audios = [
-      new Audio('assets/musicas/natal.mp3'), // Índice 0
-      new Audio('assets/musicas/natal.mp3'), // Índice 1
-      new Audio('assets/musicas/natal.mp3')  // Índice 2
+      new Audio('../assets/musicas/natal.mp3'), // Índice 0
+      new Audio('../assets/musicas/natal.mp3'), // Índice 1
+      new Audio('../assets/musicas/natal.mp3'),  // Índice 2
+      new Audio('../assets/musicas/casamento.mp3')  // Índice 2
     ];
     audios.forEach(a => a.loop = true);
 
@@ -234,8 +277,6 @@
         if (modeloId === '#modelo-1') { 
            modelo.setAttribute('color-cycle-opt', 'interval', 1000); // Garante que o componente inicia ao encontrar
         }
-
-
         audios.forEach((a, i) => { if (i !== audioIndex) a.pause(); });
         audio.currentTime = 0;
         audio.play();
@@ -252,6 +293,7 @@
     setupTarget('#targetA', '#modelo-0', 0);
     setupTarget('#targetB', '#modelo-1', 1);
     setupTarget('#targetC', '#modelo-2', 2);
+    setupTarget('#targetD', '#modelo-3', 3);
   </script>
 </body>
 </html>
