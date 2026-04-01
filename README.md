@@ -14,7 +14,7 @@ Desenvolvido para compor o portfólio da Springlo Tech, o projeto foca em acessi
 🛠️ Stack Técnica
 MindAR.js: Motor de rastreamento de imagens de alto desempenho para web.
 
-A-Frame: Framework para manipulação de entidades 3D e cenas VR/AR no DOM.
+A-Frame: Framework para manipulação de entidades 3D e cenas AR.
 
 Blender: Modelagem 3D, texturização e animação dos assets (.glb).
 
