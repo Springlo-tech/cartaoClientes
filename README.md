@@ -26,5 +26,5 @@ Acesse o link do projeto (via GitHub Pages).
 
 Conceda permissão de uso da câmera.
 
-Aponte para as imagens de exemplo localizadas na pasta /imagens (target3) aponte para o qrcode para abrir o link e depois para a imagem. 
+Aponte para as imagens de exemplo localizadas na pasta /imagens (target2,target3) . 
 
