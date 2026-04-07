@@ -4,12 +4,6 @@ Através do navegador, o usuário pode interagir com cartões físicos que ganha
 
 Desenvolvido para compor o portfólio da Springlo Tech, o projeto foca em acessibilidade (sem necessidade de baixar apps) e engajamento emocional.
 
-🌟 Demonstração de Cenários
-
-
-💍 Cartão 01 (Casamento): Ao detectar o marcador de casamento, o sistema renderiza uma animação temática, ideal para convites interativos e lembranças de luxo.
-
-🎄 Cartão 02 (Natal): Ao detectar o marcador natalino, é exibida uma cena festiva com animações sazonais, focada em cartões de boas-festas corporativos ou familiares.
 
 🛠️ Stack Técnica
 MindAR.js: Motor de rastreamento de imagens de alto desempenho para web.
