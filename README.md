@@ -21,10 +21,7 @@ Blender: Modelagem 3D, texturização e animação dos assets (.glb).
 GitHub Pages: Hospedagem estática com suporte a HTTPS (obrigatório para acesso à câmera).
 
 
-🚀 Como Executar
-Acesse o link do projeto (via GitHub Pages).
+🚀 Teste Agora (Sem App)
 
-Conceda permissão de uso da câmera.
 
-Aponte para as imagens de exemplo localizadas na pasta /imagens (target2,target3) . 
-
+Na pasta/imagens seleciona uma target e scaneie com a camera do celular o qrcode para abrir o link em seguida aponte para a imagem para iniciar a experiência.
